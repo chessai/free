@@ -60,13 +60,13 @@ import Control.Monad.Writer.Class
 import Control.Monad.State.Class
 import Control.Monad.Error.Class
 import Control.Monad.Cont.Class
-import Data.Functor.Bind
+import Data.Functor.Semimonad
 import Data.Functor.Classes.Compat
 import Data.Foldable
 import Data.Profunctor
 import Data.Traversable
-import Data.Semigroup.Foldable
-import Data.Semigroup.Traversable
+import Data.Semigroup.Semifoldable
+import Data.Semigroup.Semitraversable
 import Data.Data
 import Prelude hiding (foldr)
 #if __GLASGOW_HASKELL__ >= 707
@@ -176,7 +176,7 @@ instance Functor f => Functor (Free f) where
     go (Free fa) = Free (go <$> fa)
   {-# INLINE fmap #-}
 
-instance Apply f => Apply (Free f) where
+instance Semiapplicative f => Semiapplicative (Free f) where
   Pure a  <.> Pure b = Pure (a b)
   Pure a  <.> Free fb = Free $ fmap a <$> fb
   Free fa <.> Pure b = Free $ fmap ($ b) <$> fa
@@ -190,7 +190,7 @@ instance Applicative f => Applicative (Free f) where
   Free ma <*> Pure b = Free $ fmap ($ b) <$> ma
   Free ma <*> Free mb = Free $ fmap (<*>) ma <*> mb
 
-instance Apply f => Bind (Free f) where
+instance Semiapplicative f => Semimonad (Free f) where
   Pure a >>- f = f a
   Free m >>- f = Free ((>>- f) <$> m)
 
@@ -244,11 +244,11 @@ instance Foldable f => Foldable (Free f) where
   {-# INLINE foldl' #-}
 #endif
 
-instance Foldable1 f => Foldable1 (Free f) where
-  foldMap1 f = go where
+instance Semifoldable f => Semifoldable (Free f) where
+  semifoldMap f = go where
     go (Pure a) = f a
-    go (Free fa) = foldMap1 go fa
-  {-# INLINE foldMap1 #-}
+    go (Free fa) = semifoldMap go fa
+  {-# INLINE semifoldMap #-}
 
 instance Traversable f => Traversable (Free f) where
   traverse f = go where
@@ -256,11 +256,11 @@ instance Traversable f => Traversable (Free f) where
     go (Free fa) = Free <$> traverse go fa
   {-# INLINE traverse #-}
 
-instance Traversable1 f => Traversable1 (Free f) where
-  traverse1 f = go where
+instance Semitraversable f => Semitraversable (Free f) where
+  semitraverse f = go where
     go (Pure a) = Pure <$> f a
-    go (Free fa) = Free <$> traverse1 go fa
-  {-# INLINE traverse1 #-}
+    go (Free fa) = Free <$> semitraverse go fa
+  {-# INLINE semitraverse #-}
 
 instance (Applicative m, MonadWriter e m) => MonadWriter e (Free m) where
   tell = lift . tell

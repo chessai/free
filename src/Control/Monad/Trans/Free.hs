@@ -65,7 +65,7 @@ import Control.Monad.Writer.Class
 import Control.Monad.State.Class
 import Control.Monad.Error.Class
 import Control.Monad.Cont.Class
-import Data.Functor.Bind hiding (join)
+import Data.Functor.Semimonad hiding (join)
 import Data.Functor.Classes.Compat
 import Data.Functor.Identity
 import Data.Traversable
@@ -295,10 +295,10 @@ instance (Functor f, Monad m) => Applicative (FreeT f m) where
   (<*>) = ap
   {-# INLINE (<*>) #-}
 
-instance (Functor f, Monad m) => Apply (FreeT f m) where
+instance (Functor f, Monad m) => Semiapplicative (FreeT f m) where
   (<.>) = (<*>)
 
-instance (Functor f, Monad m) => Bind (FreeT f m) where
+instance (Functor f, Monad m) => Semimonad (FreeT f m) where
   (>>-) = (>>=)
 
 instance (Functor f, Monad m) => Monad (FreeT f m) where

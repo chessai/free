@@ -32,7 +32,7 @@ module Control.Applicative.Free.Fast
   ) where
 
 import           Control.Applicative
-import           Data.Functor.Apply
+import           Data.Functor.Semiapplicative
 import           Data.Typeable
 
 #if !(MIN_VERSION_base(4,8,0))
@@ -109,7 +109,7 @@ runAp_ f = getConst . runAp (Const . f)
 instance Functor (Ap f) where
   fmap g x = Ap (\k f -> unAp x k (\s -> f s . g))
 
-instance Apply (Ap f) where
+instance Semiapplicative (Ap f) where
   (<.>) = (<*>)
 
 instance Applicative (Ap f) where

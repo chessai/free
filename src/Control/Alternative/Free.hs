@@ -30,7 +30,7 @@ module Control.Alternative.Free
   ) where
 
 import Control.Applicative
-import Data.Functor.Apply
+import Data.Functor.Semiapplicative
 import Data.Functor.Alt ((<!>))
 import qualified Data.Functor.Alt as Alt
 import Data.Typeable
@@ -101,7 +101,7 @@ runAlt u xs0 = go xs0 where
   go2 (Ap x f) = flip id <$> u x <*> go f
 {-# INLINABLE runAlt #-}
 
-instance Apply (Alt f) where
+instance Semiapplicative (Alt f) where
   (<.>) = (<*>)
   {-# INLINE (<.>) #-}
 

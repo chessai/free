@@ -84,11 +84,11 @@ import Control.Monad.IO.Class
 import Data.Bifunctor
 import Data.Bitraversable
 import Data.Either
-import Data.Functor.Bind hiding (join)
+import Data.Functor.Semimonad hiding (join)
 import Data.Functor.Classes.Compat
 import Data.Functor.Identity
-import Data.Semigroup.Foldable
-import Data.Semigroup.Traversable
+import Data.Semigroup.Semifoldable
+import Data.Semigroup.Semitraversable
 import Data.Typeable
 import Data.Data
 
@@ -226,11 +226,11 @@ instance Monad m => Fail.MonadFail (IterT m) where
   fail _ = never
   {-# INLINE fail #-}
 
-instance Monad m => Apply (IterT m) where
+instance Monad m => Semiapplicative (IterT m) where
   (<.>) = ap
   {-# INLINE (<.>) #-}
 
-instance Monad m => Bind (IterT m) where
+instance Monad m => Semimonad (IterT m) where
   (>>-) = (>>=)
   {-# INLINE (>>-) #-}
 
@@ -261,19 +261,19 @@ instance Foldable m => Foldable (IterT m) where
   foldMap f = foldMap (either f (foldMap f)) . runIterT
   {-# INLINE foldMap #-}
 
-instance Foldable1 m => Foldable1 (IterT m) where
-  foldMap1 f = foldMap1 (either f (foldMap1 f)) . runIterT
-  {-# INLINE foldMap1 #-}
+instance Semifoldable m => Semifoldable (IterT m) where
+  semifoldMap f = semifoldMap (either f (semifoldMap f)) . runIterT
+  {-# INLINE semifoldMap #-}
 
 instance (Monad m, Traversable m) => Traversable (IterT m) where
   traverse f (IterT m) = IterT <$> traverse (bitraverse f (traverse f)) m
   {-# INLINE traverse #-}
 
-instance (Monad m, Traversable1 m) => Traversable1 (IterT m) where
-  traverse1 f (IterT m) = IterT <$> traverse1 go m where
+instance (Monad m, Semitraversable m) => Semitraversable (IterT m) where
+  semitraverse f (IterT m) = IterT <$> semitraverse go m where
     go (Left a) = Left <$> f a
-    go (Right a) = Right <$> traverse1 f a
-  {-# INLINE traverse1 #-}
+    go (Right a) = Right <$> semitraverse f a
+  {-# INLINE semitraverse #-}
 
 instance MonadReader e m => MonadReader e (IterT m) where
   ask = lift ask

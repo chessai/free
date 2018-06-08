@@ -134,7 +134,7 @@ mkArg n _ = fail $ unlines
   , "but got `" ++ pprint n ++ "'"
   , "as the last parameter of the type constructor" ]
 
--- | Apply transformation to the return value independently of how many
+-- | Semiapplicative transformation to the return value independently of how many
 -- parameters does @e@ have.
 -- E.g. @mapRet Just (\x y z -> x + y * z)@ goes to
 -- @\x y z -> Just (x + y * z)@

@@ -51,7 +51,7 @@ module Control.Applicative.Trans.Free
 
 import Control.Applicative
 import Control.Monad (liftM)
-import Data.Functor.Apply
+import Data.Functor.Semiapplicative
 import Data.Functor.Identity
 import Data.Typeable
 #if !(MIN_VERSION_base(4,8,0))
@@ -95,11 +95,11 @@ instance Applicative g => Applicative (ApT f g) where
   ApT xs <*> ApT ys = ApT ((<*>) <$> xs <*> ys)
   {-# INLINE (<*>) #-}
 
-instance Applicative g => Apply (ApF f g) where
+instance Applicative g => Semiapplicative (ApF f g) where
   (<.>) = (<*>)
   {-# INLINE (<.>) #-}
 
-instance Applicative g => Apply (ApT f g) where
+instance Applicative g => Semiapplicative (ApT f g) where
   (<.>) = (<*>)
   {-# INLINE (<.>) #-}
 

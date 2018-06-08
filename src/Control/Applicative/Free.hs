@@ -42,7 +42,7 @@ module Control.Applicative.Free
 
 import Control.Applicative
 import Control.Comonad (Comonad(..))
-import Data.Functor.Apply
+import Data.Functor.Semiapplicative
 import Data.Typeable
 
 #if !(MIN_VERSION_base(4,8,0))
@@ -79,7 +79,7 @@ instance Functor (Ap f) where
   fmap f (Pure a)   = Pure (f a)
   fmap f (Ap x y)   = Ap x ((f .) <$> y)
 
-instance Apply (Ap f) where
+instance Semiapplicative (Ap f) where
   Pure f <.> y = fmap f y
   Ap x y <.> z = Ap x (flip <$> y <.> z)
 

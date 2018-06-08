@@ -21,7 +21,7 @@ module Control.Alternative.Free.Final
   ) where
 
 import Control.Applicative
-import Data.Functor.Apply
+import Data.Functor.Semiapplicative
 import Data.Functor.Alt ((<!>))
 import qualified Data.Functor.Alt as Alt
 
@@ -35,7 +35,7 @@ newtype Alt f a = Alt { _runAlt :: forall g. Alternative g => (forall x. f x -> 
 instance Functor (Alt f) where
   fmap f (Alt g) = Alt (\k -> fmap f (g k))
 
-instance Apply (Alt f) where
+instance Semiapplicative (Alt f) where
   Alt f <.> Alt x = Alt (\k -> f k <*> x k)
 
 instance Applicative (Alt f) where

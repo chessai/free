@@ -51,7 +51,7 @@ import Control.Comonad.Hoist.Class
 import Control.Category
 import Control.Monad(ap, (>=>), liftM)
 import Control.Monad.Zip
-import Data.Functor.Bind
+import Data.Functor.Semimonad
 import Data.Functor.Classes.Compat
 import Data.Functor.Extend
 import Data.Data
@@ -59,8 +59,8 @@ import Data.Distributive
 import Data.Foldable
 import Data.Semigroup
 import Data.Traversable
-import Data.Semigroup.Foldable
-import Data.Semigroup.Traversable
+import Data.Semigroup.Semifoldable
+import Data.Semigroup.Semitraversable
 import Prelude hiding (id,(.))
 #if __GLASGOW_HASKELL__ >= 707
 import GHC.Generics hiding (Infix, Prefix)
@@ -181,7 +181,7 @@ instance (Alternative f, MonadZip f) => MonadZip (Cofree f) where
 section :: Comonad f => f a -> Cofree f a
 section as = extract as :< extend section as
 
-instance Apply f => Apply (Cofree f) where
+instance Semiapplicative f => Semiapplicative (Cofree f) where
   (f :< fs) <.> (a :< as) = f a :< ((<.>) <$> fs <.> as)
   {-# INLINE (<.>) #-}
   (f :< fs) <.  (_ :< as) = f :< ((<. ) <$> fs <.> as)
@@ -297,20 +297,20 @@ instance Foldable f => Foldable (Cofree f) where
     go s (_ :< as) = foldl' go (s + 1) as
 #endif
 
-instance Foldable1 f => Foldable1 (Cofree f) where
-  foldMap1 f = go where
-    go (a :< as) = f a <> foldMap1 go as
-  {-# INLINE foldMap1 #-}
+instance Semifoldable f => Semifoldable (Cofree f) where
+  semifoldMap f = go where
+    go (a :< as) = f a <> semifoldMap go as
+  {-# INLINE semifoldMap #-}
 
 instance Traversable f => Traversable (Cofree f) where
   traverse f = go where
     go (a :< as) = (:<) <$> f a <*> traverse go as
   {-# INLINE traverse #-}
 
-instance Traversable1 f => Traversable1 (Cofree f) where
-  traverse1 f = go where
-    go (a :< as) = (:<) <$> f a <.> traverse1 go as
-  {-# INLINE traverse1 #-}
+instance Semitraversable f => Semitraversable (Cofree f) where
+  semitraverse f = go where
+    go (a :< as) = (:<) <$> f a <.> semitraverse go as
+  {-# INLINE semitraverse #-}
 
 #if __GLASGOW_HASKELL__ < 707
 instance (Typeable1 f) => Typeable1 (Cofree f) where

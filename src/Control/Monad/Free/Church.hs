@@ -77,9 +77,9 @@ import Control.Monad.Trans.Class
 import Control.Monad.State.Class
 import Data.Foldable
 import Data.Traversable
-import Data.Functor.Bind
-import Data.Semigroup.Foldable
-import Data.Semigroup.Traversable
+import Data.Functor.Semimonad
+import Data.Semigroup.Semifoldable
+import Data.Semigroup.Semitraversable
 import Prelude hiding (foldr)
 
 -- | The Church-encoded free monad for a functor @f@.
@@ -100,7 +100,7 @@ iterM phi xs = runF xs return phi
 instance Functor (F f) where
   fmap f (F g) = F (\kp -> g (kp . f))
 
-instance Apply (F f) where
+instance Semiapplicative (F f) where
   (<.>) = (<*>)
 
 instance Applicative (F f) where
@@ -112,7 +112,7 @@ instance Alternative f => Alternative (F f) where
   empty = F (\_ kf -> kf empty)
   F f <|> F g = F (\kp kf -> kf (pure (f kp kf) <|> pure (g kp kf)))
 
-instance Bind (F f) where
+instance Semimonad (F f) where
   (>>-) = (>>=)
 
 instance Monad (F f) where
@@ -140,11 +140,11 @@ instance Traversable f => Traversable (F f) where
     traverse f m = runF m (fmap return . f) (fmap wrap . sequenceA)
     {-# INLINE traverse #-}
 
-instance Foldable1 f => Foldable1 (F f) where
-    foldMap1 f m = runF m f fold1
+instance Semifoldable f => Semifoldable (F f) where
+    semifoldMap f m = runF m f semifold
 
-instance Traversable1 f => Traversable1 (F f) where
-    traverse1 f m = runF m (fmap return . f) (fmap wrap . sequence1)
+instance Semitraversable f => Semitraversable (F f) where
+    semitraverse f m = runF m (fmap return . f) (fmap wrap . semisequence)
 
 -- | This violates the MonadPlus laws, handle with care.
 instance MonadPlus f => MonadPlus (F f) where

@@ -55,7 +55,7 @@ import Control.Monad.Writer.Class
 import Control.Monad.State.Class
 import Control.Monad.Error.Class
 import Control.Monad.Cont.Class
-import Data.Functor.Bind hiding (join)
+import Data.Functor.Semimonad hiding (join)
 import Data.Functor.Classes.Compat
 import Data.Functor.Identity
 import Data.Traversable
@@ -289,14 +289,14 @@ instance (Applicative f, Applicative m, Monad m) => Applicative (FreeT f m) wher
     g (Free fs) (Free as) = Free $ (<*>) <$> fs <*> as
   {-# INLINE (<*>) #-}
 
-instance (Apply f, Apply m, Monad m) => Apply (FreeT f m) where
+instance (Semiapplicative f, Semiapplicative m, Monad m) => Semiapplicative (FreeT f m) where
   FreeT f <.> FreeT a = FreeT $ g <$> f <.> a where
     g (Pure f') (Pure a') = Pure (f' a')
     g (Pure f') (Free as) = Free $ fmap f' <$> as
     g (Free fs) (Pure a') = Free $ fmap ($ a') <$> fs
     g (Free fs) (Free as) = Free $ (<.>) <$> fs <.> as
 
-instance (Apply f, Apply m, Monad m) => Bind (FreeT f m) where
+instance (Semiapplicative f, Semiapplicative m, Monad m) => Semimonad (FreeT f m) where
   FreeT m >>- f = FreeT $ m >>= \v -> case v of
     Pure a -> runFreeT (f a)
     Free w -> return (Free (fmap (>>- f) w))

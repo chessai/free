@@ -32,7 +32,7 @@ module Control.Applicative.Free.Final
   ) where
 
 import Control.Applicative
-import Data.Functor.Apply
+import Data.Functor.Semiapplicative
 
 #if !(MIN_VERSION_base(4,8,0))
 import Data.Monoid
@@ -61,7 +61,7 @@ runAp_ f = getConst . runAp (Const . f)
 instance Functor (Ap f) where
   fmap f (Ap g) = Ap (\k -> fmap f (g k))
 
-instance Apply (Ap f) where
+instance Semiapplicative (Ap f) where
   Ap f <.> Ap x = Ap (\k -> f k <*> x k)
 
 instance Applicative (Ap f) where

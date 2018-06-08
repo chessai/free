@@ -62,7 +62,7 @@ import Control.Monad.Trans.Free (FreeT(..), FreeF(..), Free)
 import qualified Control.Monad.Trans.Free as FreeT
 import qualified Data.Foldable as F
 import qualified Data.Traversable as T
-import Data.Functor.Bind hiding (join)
+import Data.Functor.Semimonad hiding (join)
 import Data.Functor.Classes.Compat
 
 #if !(MIN_VERSION_base(4,8,0))
@@ -104,14 +104,14 @@ instance (Ord1 (FT f m), Ord a) => Ord (FT f m a) where
 instance Functor (FT f m) where
   fmap f (FT k) = FT $ \a fr -> k (a . f) fr
 
-instance Apply (FT f m) where
+instance Semiapplicative (FT f m) where
   (<.>) = (<*>)
 
 instance Applicative (FT f m) where
   pure a = FT $ \k _ -> k a
   FT fk <*> FT ak = FT $ \b fr -> fk (\e -> ak (\d -> b (e d)) fr) fr
 
-instance Bind (FT f m) where
+instance Semimonad (FT f m) where
   (>>-) = (>>=)
 
 instance Monad (FT f m) where
